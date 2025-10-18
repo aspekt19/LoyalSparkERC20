@@ -181,7 +181,7 @@ await transfer.wait();
 - **🏭 [Loyalty Token Factory](https://github.com/aspekt19/LoyaltyTokenFactory)** - Deploy new loyalty programs
 - **💻 [Loyal Spark Web App](https://github.com/aspekt19/unboxed-loyalty-spark)** - Frontend application
 - **📖 [BASE Network Docs](https://docs.base.org)** - Blockchain documentation
-- **🎨 [Media Kit](https://github.com/aspekt19/loyal-spark/blob/main/public/media-kit/README.md)** - Brand assets
+- **🎨 [Media Kit](https://github.com/aspekt19/unboxed-loyalty-spark/tree/main/public/media-kit)** - Brand assets
 
 ---
 
