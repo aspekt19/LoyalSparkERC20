@@ -1,220 +1,399 @@
-# 🎯 Loyal Spark ERC-20 Token Contract
+# LoyalSparkERC20 - Smart Contract Documentation
 
-<div align="center">
+## Overview
 
-![BASE Network](https://img.shields.io/badge/BASE-Mainnet-blue?style=for-the-badge&logo=ethereum)
-![Solidity](https://img.shields.io/badge/Solidity-%5E0.8.0-363636?style=for-the-badge&logo=solidity)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+LoyalSparkERC20 is an extended ERC20 token implementation with loyalty program management functions, including mint, burn, pause, and activity status.
 
-**Decentralized Loyalty Rewards on Blockchain**
+**Official project website:** [https://loyalspark.online](https://loyalspark.online)
 
-[Documentation](https://docs.loyalspark.app) • [Factory Contract](https://github.com/aspekt19/LoyaltyTokenFactory) • [Web App](https://github.com/aspekt19/loyal-spark)
+## Contract Addresses (Base Mainnet)
 
-</div>
-
----
-
-## 📋 Overview
-
-The **Loyal Spark ERC-20** smart contract is the core token implementation for decentralized loyalty reward programs. Each merchant can deploy their own branded loyalty token with customizable parameters, enabling transparent and transferable reward systems on the BASE blockchain.
-
-### ✨ Key Features
-
-- **🪙 ERC-20 Standard Compliance** - Full compatibility with wallets and DEXs
-- **🔥 Built-in Burn Mechanism** - Customers can redeem rewards by burning tokens
-- **🎨 Customizable Metadata** - Merchants set token name, symbol, and metadata URI
-- **🔒 Merchant-Only Minting** - Only the merchant can mint new reward tokens
-- **🌐 Decentralized & Transparent** - All transactions visible on-chain
-- **💱 Tradeable** - Tokens can be transferred between users or traded on DEXs
+- **LoyaltyTokenFactory**: `0x5F3DdBa12580CFdc6016258774cCc19C4250dA80`
+- **LoyalSparkERC20 (Implementation)**: `0xe6BA426C9c51281B929a17444De02c65815E27C3`
+- **Chain ID**: `8453` (Base Mainnet)
 
 ---
 
-## 🏗️ Contract Architecture
+## Standard ERC20 Functions
 
-```solidity
-contract LoyalSparkERC20 is ERC20, Ownable
-```
+### `balanceOf(address account) → uint256` (view)
 
-### Core Functions
+Returns the token balance at the specified address.
 
-#### For Merchants (Owner)
-
-```solidity
-function mintLoyaltyPoints(address to, uint256 amount) external onlyOwner
-```
-Mint new loyalty tokens to reward customers.
-
-```solidity
-function setTokenURI(string memory newTokenURI) external onlyOwner
-```
-Update token metadata URI for additional information.
-
-#### For Customers
-
-```solidity
-function burnLoyaltyPoints(uint256 amount) external
-```
-Burn tokens to redeem rewards or benefits from the merchant.
-
-```solidity
-function transfer(address to, uint256 amount) external returns (bool)
-```
-Transfer tokens to other users (standard ERC-20).
-
----
-
-## 🚀 Deployment
-
-### Prerequisites
-
-- Solidity compiler `^0.8.0`
-- BASE Mainnet RPC endpoint
-- Deployment wallet with BASE ETH
-
-### Constructor Parameters
-
-```solidity
-constructor(
-    string memory name,        // Token name (e.g., "Starbucks Rewards")
-    string memory symbol,      // Token symbol (e.g., "SBUX")
-    string memory tokenURI,    // Metadata URI
-    address initialOwner       // Merchant wallet address
-)
-```
-
-### Example Deployment
-
+**Example:**
 ```javascript
-const tokenName = "Coffee Shop Rewards";
-const tokenSymbol = "COFFEE";
-const tokenURI = "ipfs://QmExample...";
-const merchantAddress = "0x1234...";
-
-const LoyalSparkToken = await ethers.deployContract("LoyalSparkERC20", [
-  tokenName,
-  tokenSymbol,
-  tokenURI,
-  merchantAddress
-]);
-```
-
----
-
-## 🔗 Network Information
-
-| Parameter | Value |
-|-----------|-------|
-| **Blockchain** | BASE Mainnet |
-| **Chain ID** | 8453 |
-| **Token Standard** | ERC-20 |
-| **Factory Contract** | `0x61b154cAE13F2312D33397419195753D3849F858` |
-| **Default Token** | `0xc46481b25a0E6161d87F84C0dd2B0721B891cB4e` |
-
----
-
-## 💡 Use Cases
-
-### 🏪 Retail Loyalty Programs
-Coffee shops, restaurants, and retail stores can issue tokens for purchases and allow customers to burn them for discounts or free items.
-
-### 🎮 Gaming & Community Rewards
-Game developers and community platforms can reward engagement with tradeable tokens.
-
-### 🎓 Membership Programs
-Gyms, clubs, and subscription services can use tokens for tier-based benefits.
-
-### 🤝 Multi-Merchant Ecosystems
-Multiple merchants can create interoperable loyalty programs where tokens from different programs can be traded or pooled.
-
----
-
-## 🔒 Security Features
-
-- ✅ **OpenZeppelin Contracts** - Battle-tested, audited base implementations
-- ✅ **Owner-Only Minting** - Prevents unauthorized token creation
-- ✅ **Burn from Own Balance** - Users can only burn their own tokens
-- ✅ **Standard ERC-20** - Compatible with existing security tools and wallets
-
----
-
-## 📊 Token Economics
-
-| Feature | Details |
-|---------|---------|
-| **Initial Supply** | 0 (tokens minted on-demand) |
-| **Max Supply** | Unlimited (controlled by merchant) |
-| **Decimals** | 18 (standard ERC-20) |
-| **Burn Mechanism** | Direct burn by token holders |
-| **Transfer** | Unrestricted (standard ERC-20) |
-
----
-
-## 🛠️ Integration Example
-
-### Web3 Integration (ethers.js)
-
-```javascript
-import { ethers } from 'ethers';
-import LoyalSparkABI from './LoyalSparkERC20.json';
-
-// Connect to contract
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const tokenContract = new ethers.Contract(tokenAddress, LoyalSparkABI, signer);
-
-// Check balance
 const balance = await tokenContract.balanceOf(userAddress);
+```
 
-// Burn tokens (redeem rewards)
-const tx = await tokenContract.burnLoyaltyPoints(ethers.utils.parseEther("10"));
-await tx.wait();
+### `transfer(address to, uint256 amount) → bool`
 
-// Transfer tokens
-const transfer = await tokenContract.transfer(recipientAddress, amount);
-await transfer.wait();
+Transfers tokens to the specified address.
+
+**Example:**
+```javascript
+await tokenContract.transfer(recipientAddress, ethers.parseUnits("10", 18));
+```
+
+### `approve(address spender, uint256 amount) → bool`
+
+Allows the specified address to spend tokens on behalf of the owner.
+
+**Example:**
+```javascript
+await tokenContract.approve(spenderAddress, ethers.parseUnits("100", 18));
+```
+
+### `allowance(address owner, address spender) → uint256` (view)
+
+Returns the amount of tokens that `spender` can spend on behalf of `owner`.
+
+**Example:**
+```javascript
+const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
+```
+
+### `transferFrom(address from, address to, uint256 amount) → bool`
+
+Transfers tokens from one address to another (requires prior `approve`).
+
+**Example:**
+```javascript
+await tokenContract.transferFrom(fromAddress, toAddress, ethers.parseUnits("50", 18));
+```
+
+### `name() → string` (view)
+
+Returns the token name.
+
+### `symbol() → string` (view)
+
+Returns the token symbol.
+
+### `decimals() → uint8` (view)
+
+Returns the number of decimal places (typically 18).
+
+### `totalSupply() → uint256` (view)
+
+Returns the total supply of issued tokens.
+
+---
+
+## Extended Management Functions
+
+### `mint(address account, uint256 amount)`
+
+Mints new tokens to the specified address.
+
+**Restrictions:**
+- Can only be called by the owner (merchant)
+- Requires active minting status (`isMintingActive == true`)
+
+**Parameters:**
+- `account` - Token recipient address
+- `amount` - Token amount (in wei, i.e., with 18 decimals)
+
+**Example:**
+```javascript
+// Mint 100 tokens
+await tokenContract.mint(customerAddress, ethers.parseUnits("100", 18));
+```
+
+### `burn(address account, uint256 amount)`
+
+Burns (destroys) tokens from the specified address.
+
+**Restrictions:**
+- Can only be called by the owner (merchant)
+- Does not require `approve` from token holder
+
+**Parameters:**
+- `account` - Address from which tokens are burned
+- `amount` - Amount of tokens to burn
+
+**Usage:**
+Used when deleting a loyalty program to burn all existing tokens.
+
+**Example:**
+```javascript
+// Burn all user tokens
+await tokenContract.burn(customerAddress, balance);
 ```
 
 ---
 
-## 📚 Related Resources
+## Status Management Functions
 
-- **🏭 [Loyalty Token Factory](https://github.com/aspekt19/LoyaltyTokenFactory)** - Deploy new loyalty programs
-- **💻 [Loyal Spark Web App](https://github.com/aspekt19/unboxed-loyalty-spark)** - Frontend application
-- **📖 [BASE Network Docs](https://docs.base.org)** - Blockchain documentation
-- **🎨 [Media Kit](https://github.com/aspekt19/unboxed-loyalty-spark/tree/main/public/media-kit)** - Brand assets
+### `enableMinting()`
+
+Enables the ability to mint new tokens.
+
+**Restrictions:**
+- Owner only
+
+**Example:**
+```javascript
+await tokenContract.enableMinting();
+```
+
+### `disableMinting()`
+
+Disables the ability to mint new tokens.
+
+**Restrictions:**
+- Owner only
+
+**Example:**
+```javascript
+await tokenContract.disableMinting();
+```
+
+### `pauseUtility()`
+
+Pauses token usage (transfers, reward activation).
+
+**Restrictions:**
+- Owner only
+
+**Effects:**
+- All `transfer` and `transferFrom` calls will be rejected
+- Tokens remain in balance but cannot be used
+
+**Example:**
+```javascript
+await tokenContract.pauseUtility();
+```
+
+### `unpauseUtility()`
+
+Resumes token usage.
+
+**Restrictions:**
+- Owner only
+
+**Example:**
+```javascript
+await tokenContract.unpauseUtility();
+```
 
 ---
 
-## 🤝 Contributing
+## Status View Functions
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### `isMintingActive() → bool` (view)
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Checks if token minting is active.
+
+**Returns:**
+- `true` - minting is allowed
+- `false` - minting is blocked
+
+**Example:**
+```javascript
+const isActive = await tokenContract.isMintingActive();
+```
+
+### `isUtilityActive() → bool` (view)
+
+Checks if token usage is active (not paused).
+
+**Returns:**
+- `true` - tokens can be transferred and used
+- `false` - tokens are paused
+
+**Example:**
+```javascript
+const isActive = await tokenContract.isUtilityActive();
+```
+
+### `getMerchantAddress() → address` (view)
+
+Returns the merchant owner address of the program.
+
+**Example:**
+```javascript
+const merchantAddress = await tokenContract.getMerchantAddress();
+```
+
+### `owner() → address` (view)
+
+Returns the contract owner address (typically matches the merchant).
+
+**Example:**
+```javascript
+const owner = await tokenContract.owner();
+```
 
 ---
 
-## 📄 License
+## Program Lifecycle
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+### 1. Issuing Tokens to Customers
+
+```javascript
+// Merchant mints tokens to customer
+await loyaltyToken.mint(
+  customerAddress,
+  ethers.parseUnits("50", 18) // 50 токенов
+);
+```
+
+### 2. Using Tokens
+
+```javascript
+// Customer transfers tokens to merchant to activate reward
+await loyaltyToken.transfer(
+  merchantAddress,
+  ethers.parseUnits("10", 18) // 10 токенов за вознаграждение
+);
+```
+
+### 3. Pausing the Program
+
+```javascript
+// Merchant temporarily pauses the program
+await loyaltyToken.pauseUtility();
+
+// Check status
+const isActive = await loyaltyToken.isUtilityActive(); // false
+```
+
+### 4. Resuming the Program
+
+```javascript
+// Merchant resumes the program
+await loyaltyToken.unpauseUtility();
+```
+
+### 5. Deleting the Program
+
+```javascript
+// Get all token holders
+const holders = await getTokenHolders(tokenAddress);
+
+// Burn tokens from all holders in batches of 5
+for (let i = 0; i < holders.length; i += 5) {
+  const batch = holders.slice(i, i + 5);
+  
+  for (const holder of batch) {
+    const balance = await loyaltyToken.balanceOf(holder.address);
+    if (balance > 0) {
+      await loyaltyToken.burn(holder.address, balance);
+    }
+  }
+}
+```
 
 ---
 
-## 🌟 Acknowledgments
+## Security and Restrictions
 
-- Built on [OpenZeppelin](https://openzeppelin.com/) contracts
-- Deployed on [BASE Network](https://base.org/)
-- Part of the Loyal Spark ecosystem
+### Access Control
+
+- **Owner only** can:
+  - Mint tokens (`mint`)
+  - Burn tokens (`burn`)
+  - Enable/disable minting
+  - Pause/unpause usage
+
+### Protection Against Abuse
+
+1. **Pause mechanism**: Allows merchant to instantly stop all token operations
+2. **Burn without approve**: Merchant can burn tokens from any holder without prior approval (for program closure)
+3. **Disable minting**: Prevents minting of new tokens after program completion
+
+### Program Status States
+
+The program can be in one of the following states:
+
+| Status | isMintingActive | isUtilityActive | Description |
+|--------|----------------|-----------------|----------|
+| **Active** | ✅ true | ✅ true | Fully operational program |
+| **Paused** | ✅ true | ❌ false | Tokens frozen, minting possible |
+| **Closed** | ❌ false | ❌ false | Program completed |
 
 ---
 
-<div align="center">
+## Frontend Integration
 
-**Built with ❤️ for the Web3 community**
+### Connecting to the Contract
 
-[Website](https://loyalspark.app) • [Twitter](#) • [Discord](#)
+```javascript
+import { CONTRACTS } from '@/config/contracts';
+import { useWriteContract, useReadContract } from 'wagmi';
 
-</div>
+// Minting tokens
+const { writeContract } = useWriteContract();
+
+await writeContract({
+  address: tokenAddress,
+  abi: CONTRACTS.LOYAL_SPARK_ERC20.abi,
+  functionName: 'mint',
+  args: [recipientAddress, amount],
+});
+```
+
+### Reading Status
+
+```javascript
+// Checking program status
+const { data: isActive } = useReadContract({
+  address: tokenAddress,
+  abi: CONTRACTS.LOYAL_SPARK_ERC20.abi,
+  functionName: 'isUtilityActive',
+});
+```
+
+### Managing Status
+
+```javascript
+// Pause program
+await writeContract({
+  address: tokenAddress,
+  abi: CONTRACTS.LOYAL_SPARK_ERC20.abi,
+  functionName: 'pauseUtility',
+});
+
+// Resume program
+await writeContract({
+  address: tokenAddress,
+  abi: CONTRACTS.LOYAL_SPARK_ERC20.abi,
+  functionName: 'unpauseUtility',
+});
+```
+
+---
+
+## Frequently Asked Questions
+
+### Can burned tokens be recovered?
+
+No, burned tokens are permanently deleted and cannot be recovered.
+
+### What happens to tokens when paused?
+
+Tokens remain in holders' balances but cannot be transferred or used until the pause is lifted.
+
+### Can the program owner be changed?
+
+Yes, using the standard `transferOwnership` function (if implemented in the contract).
+
+### Can tokens be used on DEXs?
+
+Yes, tokens are fully ERC20 compliant and can be traded on any DEX (Uniswap, SushiSwap, etc.).
+
+### What happens when trying to transfer while paused?
+
+The transaction will be rejected with an error, and tokens will remain in the sender's balance.
+
+---
+
+## Support
+
+For questions and support:
+- Official website: [https://loyalspark.online](https://loyalspark.online)
+- Email: support@loyalspark.io
+
+## License
+
+MIT License - see LICENSE file for details.
