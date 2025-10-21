@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at basescan.org on 2025-10-21
+*/
+
 // SPDX-License-Identifier: MIT
 // File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
@@ -1014,26 +1018,32 @@ pragma solidity ^0.8.20;
 
 /**
  * @title LoyalSparkERC20
- * @dev Это стандартный токен ERC-20, который будет представлять баллы лояльности
- * для одного конкретного мерчанта. Использует Initializable для совместимости с Factory/Proxy.
+ * @dev Модернизированный ERC-20 для баллов лояльности с функциями блокировки/разблокировки полезности.
+ * Предназначен для развертывания через Upgradeable Proxy (Фабрику).
  */
 contract LoyalSparkERC20 is Initializable, ERC20Upgradeable, OwnableUpgradeable {
 
     // Адрес, который авторизован для выпуска (Mint) и погашения (Burn) токенов.
-    // Это адрес, который развернул токен через Factory.
     address private _merchantAddress;
+
+    // --- ПЕРЕМЕННЫЕ СОСТОЯНИЯ ДЛЯ УПРАВЛЕНИЯ ПОЛЕЗНОСТЬЮ ---
+    
+    // Флаг, который блокирует передачу и сжигание (основную полезность токена).
+    bool public isUtilityActive = true; 
+    
+    // Флаг, который блокирует выпуск новых токенов (эмиссия).
+    bool public isMintingActive = true; 
 
     // --- Events (События) ---
 
     event MerchantUpdated(address indexed newMerchant);
+    event UtilityToggled(bool active);
+    event MintingToggled(bool active);
 
-    // --- Constructor (Конструктор заменен на Initialize) ---
+    // --- Initialize (Конструктор Прокси) ---
 
     /**
      * @dev Инициализация токена (вызывается Factory при деплое Прокси).
-     * @param name_ Название токена (например, "Coffee Shop Stars").
-     * @param symbol_ Символ токена (например, "STAR").
-     * @param initialMerchantAddress Адрес мерчанта, который будет иметь право на Mint/Burn.
      */
     function initialize(
         string memory name_,
@@ -1058,31 +1068,57 @@ contract LoyalSparkERC20 is Initializable, ERC20Upgradeable, OwnableUpgradeable 
         _;
     }
 
+    /**
+     * @dev Запрещает выполнение, если полезность токена заблокирована.
+     */
+    modifier onlyActiveUtility() {
+        require(isUtilityActive, "LSPARK: Utility is currently paused.");
+        _;
+    }
+
+    /**
+     * @dev Запрещает выполнение, если минтинг заблокирован.
+     */
+    modifier onlyActiveMinting() {
+        require(isMintingActive, "LSPARK: Minting is currently disabled.");
+        _;
+    }
+
+
     // --- Loyalty Functions (Функции лояльности) ---
 
     /**
      * @dev Выпуск новых токенов (баллов) для клиента.
-     * Эту функцию может вызвать только мерчант.
-     * @param account Адрес клиента, которому выпускаются баллы.
-     * @param amount Количество выпускаемых баллов.
      */
-    function mint(address account, uint256 amount) public onlyMerchant {
+    function mint(address account, uint256 amount) public onlyMerchant onlyActiveMinting {
         require(account != address(0), "ERC20: mint to the zero address");
         _mint(account, amount);
     }
 
     /**
      * @dev Погашение (сжигание) токенов (баллов) клиента при их обмене на награду.
-     * Эту функцию может вызвать только мерчант.
-     * @param account Адрес клиента, у которого сжигаются баллы.
-     * @param amount Количество погашаемых баллов.
      */
-    function burn(address account, uint256 amount) public onlyMerchant {
+    function burn(address account, uint256 amount) public onlyMerchant onlyActiveUtility {
         require(account != address(0), "ERC20: burn from the zero address");
-        // Чтобы мерчант мог сжечь токены клиента, клиент должен предварительно
-        // дать разрешение мерчанту (через approve).
         _burn(account, amount);
     }
+
+    // --- OVERRIDES (Переопределение базовых функций ERC-20) ---
+    
+    /**
+     * @dev Переопределение для блокировки передачи покупателями.
+     */
+    function transfer(address to, uint256 amount) public override onlyActiveUtility returns (bool) {
+        return super.transfer(to, amount);
+    }
+
+    /**
+     * @dev Переопределение для блокировки перевода по разрешению (transferFrom).
+     */
+    function transferFrom(address from, address to, uint256 amount) public override onlyActiveUtility returns (bool) {
+        return super.transferFrom(from, to, amount);
+    }
+
 
     // --- Merchant Management (Управление мерчантом) ---
 
@@ -1092,4 +1128,41 @@ contract LoyalSparkERC20 is Initializable, ERC20Upgradeable, OwnableUpgradeable 
     function getMerchantAddress() public view returns (address) {
         return _merchantAddress;
     }
+
+    // --- ФУНКЦИИ УПРАВЛЕНИЯ БЛОКИРОВКАМИ (KILL SWITCH) ---
+    
+    /**
+     * @dev Блокирует передачу, сжигание и торговлю токенами (отключает полезность).
+     * Вызывается мерчантом при закрытии программы лояльности.
+     */
+    function pauseUtility() public onlyMerchant {
+        isUtilityActive = false;
+        emit UtilityToggled(false);
+    }
+
+    /**
+     * @dev Восстанавливает передачу, сжигание и торговлю токенами (возвращает полезность).
+     * Вызывается мерчантом при перезапуске программы лояльности.
+     */
+    function unpauseUtility() public onlyMerchant {
+        isUtilityActive = true;
+        emit UtilityToggled(true);
+    }
+    
+    /**
+     * @dev Блокирует выпуск новых токенов (отключает минтинг).
+     */
+    function disableMinting() public onlyMerchant {
+        isMintingActive = false;
+        emit MintingToggled(false);
+    }
+
+    /**
+     * @dev Восстанавливает выпуск новых токенов (включает минтинг).
+     */
+    function enableMinting() public onlyMerchant {
+        isMintingActive = true;
+        emit MintingToggled(true);
+    }
+    
 }
