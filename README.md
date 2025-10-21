@@ -392,7 +392,7 @@ The transaction will be rejected with an error, and tokens will remain in the se
 
 For questions and support:
 - Official website: [https://loyalspark.online](https://loyalspark.online)
-- Email: support@loyalspark.io
+- Email: gerassyk@gmail.com
 
 ## License
 
