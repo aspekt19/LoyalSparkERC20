@@ -380,7 +380,7 @@ Yes, using the standard `transferOwnership` function (if implemented in the cont
 
 ### Can tokens be used on DEXs?
 
-Yes, tokens are fully ERC20 compliant and can be traded on any DEX (Uniswap, SushiSwap, etc.).
+Yes, tokens are fully ERC20 compliant and can be traded on any DEX (Uniswap, SushiSwap, and etc.).
 
 ### What happens when trying to transfer while paused?
 
